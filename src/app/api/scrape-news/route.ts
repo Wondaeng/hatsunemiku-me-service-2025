@@ -14,7 +14,7 @@ interface ScrapedItem {
 async function scrapeWikiItems(): Promise<{ hatsuneMiku: ScrapedItem[]; vocaloid: ScrapedItem[] }> {
   try {
     const response = await fetch(TARGET_URL, { 
-      next: { revalidate: 3600 }
+      cache: 'no-store'
     })
     if (!response.ok) {
       console.error(`Failed to fetch data: ${response.statusText}`)
