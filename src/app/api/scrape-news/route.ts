@@ -13,15 +13,18 @@ interface ScrapedItem {
 
 async function scrapeWikiItems(): Promise<{ hatsuneMiku: ScrapedItem[]; vocaloid: ScrapedItem[] }> {
   try {
-    // Disable cache to avoid returning stale/cached forbidden response
     const response = await fetch(TARGET_URL, { 
-      cache: 'no-store'
+      next: { revalidate: 3600 }
     })
     if (!response.ok) {
       console.error(`Failed to fetch data: ${response.statusText}`)
       return { hatsuneMiku: [], vocaloid: [] }
     }
     const html = await response.text()
+    
+    // Debug: log first 500 chars to see if we got real content or Cloudflare
+    console.log('HTML preview:', html.substring(0, 500))
+    
     const $ = cheerio.load(html)
 
     const hatsuneMiku: ScrapedItem[] = []
