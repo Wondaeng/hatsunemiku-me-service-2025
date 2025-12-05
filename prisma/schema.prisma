@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model NewsItem {
+  id          Int       @id @default(autoincrement())
+  externalId  String    @unique                        // Hash of content for deduplication
+  date        DateTime?                                // News date (nullable)
+  htmlContent String                                   // The news HTML content
+  category    Category                                 // HATSUNE_MIKU or VOCALOID
+  createdAt   DateTime  @default(now())                // When first scraped
+  scrapedAt   DateTime  @default(now())                // When last seen
+
+  @@index([category, date(sort: Desc)])               // Speed up queries by category
+}
+
+enum Category {
+  HATSUNE_MIKU
+  VOCALOID
+}
